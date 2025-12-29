@@ -1,0 +1,11 @@
+transformers
+numpy
+timm
+torch
+torchvision
+onnxruntime
+pillow
+scipy
+onnxscript
+onnxruntime
+onnxruntime-tools

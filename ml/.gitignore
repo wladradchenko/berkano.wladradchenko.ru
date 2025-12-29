@@ -1,0 +1,81 @@
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =====================
+# Virtual environments
+# =====================
+.env
+.venv
+venv/
+ENV/
+env/
+
+# =====================
+# Jupyter / IPython
+# =====================
+.ipynb_checkpoints/
+.profile_default/
+ipython_config.py
+
+# =====================
+# Build / packaging
+# =====================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =====================
+# Logs
+# =====================
+*.log
+
+# =====================
+# OS / Editor
+# =====================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =====================
+# ML / Data
+# =====================
+*.pth
+*.pt
+*.onnx
+*.ckpt
+*.h5
+
+# Datasets
+data/
+datasets/
+models/disease_detection/assets
+models/disease_detection/checkpoints
+models/plant_classification/checkpoints
+
+*.npz
+*.npy
+
+# =====================
+# Caches
+# =====================
+.cache/
+.mypy_cache/
+.pytest_cache/
+
+# =====================
+# Torch / CUDA
+# =====================
+*.cuda
+*.cuo
+
+# =====================
+# Secrets
+# =====================
+.env.*
+secrets.yaml
