@@ -53,7 +53,7 @@ async function copyAssetIfNeeded(assetName: string, folder: string): Promise<str
 }
 
 export async function prepareModelAssets() {
-  const modelPath = await copyAssetIfNeeded('scold_image_only_fp16.onnx', 'models');
+  const modelPath = await copyAssetIfNeeded('disease_detection.onnx', 'models');
   const embeddingsPath = await copyAssetIfNeeded('embeddings.bin', 'files');
   const captionsPath = await copyAssetIfNeeded('captions.json', 'files');
   const classMappingPath = await copyAssetIfNeeded('class_mapping.txt', 'files');
