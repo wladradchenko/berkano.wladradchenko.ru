@@ -90,7 +90,7 @@ The `mobile` folder contains a **React Native (vanilla, no Expo) app** that demo
 * Compatible with **Android** and **iOS**
 * Requires models and supporting files to be placed in `mobile/assets` (from the same HuggingFace repository)
 
-For detailed instructions on running the mobile app, see the `mobile/README.md`.
+For detailed instructions on running the mobile app, see the `mobile/README.md` and [interface screen](https://github.com/wladradchenko/berkano.wladradchenko.ru/blob/main/assets/example.png).
 
 ---
 
