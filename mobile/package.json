@@ -10,14 +10,28 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/blur": "^4.4.1",
+    "@react-native-community/geolocation": "^3.4.0",
     "@react-native/new-app-screen": "0.83.1",
+    "@react-navigation/native": "^7.1.26",
+    "@react-navigation/stack": "^7.6.13",
+    "cesium": "^1.136.0",
+    "i18next": "^25.7.3",
     "onnxruntime-react-native": "^1.23.2",
     "react": "19.2.0",
+    "react-i18next": "^16.5.0",
     "react-native": "0.83.1",
     "react-native-fs": "^2.20.0",
+    "react-native-gesture-handler": "^2.30.0",
     "react-native-image-picker": "^8.2.1",
     "react-native-image-resizer": "^1.4.5",
-    "react-native-safe-area-context": "^5.5.2"
+    "react-native-reanimated": "^4.2.1",
+    "react-native-safe-area-context": "^5.6.2",
+    "react-native-screens": "^4.19.0",
+    "react-native-svg": "^15.15.1",
+    "react-native-webview": "^13.16.0",
+    "react-native-worklets": "^0.7.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

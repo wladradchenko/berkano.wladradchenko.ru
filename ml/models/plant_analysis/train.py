@@ -297,7 +297,7 @@ torch.onnx.export(
     model,
     dummy,
     args.output_name,
-    opset_version=12,
+    opset_version=18,
     input_names=["image"],
     output_names=["features", "count", "age"],
     dynamic_axes={"image": {0: "batch"}}

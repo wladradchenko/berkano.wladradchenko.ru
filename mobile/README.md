@@ -1,219 +1,143 @@
-# Image Search App with ONNX Runtime Mobile
+# Plant Analysis Mobile App
 
-Мобильное приложение на React Native для поиска похожих изображений с использованием ONNX Runtime Mobile. Приложение использует GPU/NPU через NNAPI для выполнения модели машинного обучения на устройстве.
+This folder contains a **React Native** project (without Expo) demonstrating mobile usage of the plant ML models for **disease detection**, **plant classification**, and **age & leaf count estimation**.
 
-## Особенности
+The app allows users to:
 
-- ✅ ONNX Runtime Mobile с поддержкой GPU/NPU через NNAPI
-- ✅ Поиск по векторным представлениям (embeddings) с использованием косинусного расстояния
-- ✅ Настраиваемое количество результатов поиска (топ-K)
-- ✅ Загрузка изображений из галереи
-- ✅ Чистый React Native (без Expo) для максимальной производительности
+1. Upload a photo of the whole plant for **species classification** and **age/leaf count estimation**.
+2. Upload specific photos of leaves, stems, or other plant parts for **disease detection**.
 
-## Требования
+It serves as an example of **adapting ML models for mobile devices** using ONNX and React Native.
 
-- React Native 0.83.1+
-- Node.js >= 20
-- Android SDK (для Android)
-- Xcode (для iOS)
-- Минимальные требования устройства: Tensor G2 или эквивалент/мощнее
-- Android 8.1+ (для NNAPI поддержки)
+---
 
-## Структура проекта
+## Project Structure
 
 ```
-src/
-├── assets/
-│   ├── db/
-│   │   ├── embeddings.bin    # Векторные представления (Float32Array)
-│   │   └── captions.json    # Метки для каждого вектора
-│   ├── images/
-│   │   └── image.jpg        # Тестовое изображение
-│   └── models/
-│       └── scold_image_only_fp16.onnx  # Квантизированная ONNX модель
-├── components/
-│   └── ImageSearchScreen.tsx  # Главный UI компонент
-└── services/
-    ├── imagePreprocessing.ts  # Предобработка изображений
-    ├── onnxService.ts         # Работа с ONNX моделью
-    └── embeddingsService.ts   # Загрузка embeddings и поиск
+mobile/
+├── android/               # Android native code
+├── ios/                   # iOS native code
+├── assets/                # ML models and data files
+│   ├── models/            # ONNX models
+│   └── files/             # embeddings, captions, mappings
+├── src/                   # React Native JavaScript/TypeScript code
+├── package.json           # Node dependencies
+└── ...
 ```
 
-## Установка зависимостей
+---
+
+## Setup
+
+### 1. Download Models and Assets
+
+Clone the repository with ML models:
+
+```bash
+git clone https://huggingface.co/wladradchenko/berkano.wladradchenko.ru
+```
+
+Copy the following into the `mobile/assets` folder:
+
+* `models/` → contains `disease_detection.onnx`, `plant_classification.onnx`, `plant_analysis.onnx`
+* `files/` → contains `embeddings.bin`, `captions.json`, `class_mapping.txt`, `species_id_to_name.txt`, etc.
+
+---
+
+### 2. Install Dependencies
+
+Inside the `mobile` folder, install Node.js dependencies:
 
 ```bash
 npm install
 ```
 
-## Важные замечания
+This will create the `node_modules/` folder.
 
-### Предобработка изображений
+---
 
-⚠️ **Текущая реализация предобработки изображений упрощенная**. Для production необходимо создать нативный модуль для декодирования изображений в тензор формата `[1, 3, 224, 224]` с нормализацией значений в диапазоне `[0, 1]`.
+### 3. Start the Metro Bundler
 
-Текущий код использует заглушку для тестирования. Для реальной работы нужно:
+Start the React Native development server:
 
-1. Создать нативный модуль (Android/iOS) для декодирования изображений
-2. Или использовать библиотеку типа `react-native-fast-image` с нативным расширением
+```bash
+npm start
+```
 
-### Загрузка assets
+Keep this terminal open while running the app.
 
-Файлы `embeddings.bin` и `captions.json` копируются из assets в локальную файловую систему при первом запуске. Убедитесь, что файлы находятся в правильных директориях.
+---
 
-### ONNX Runtime
+### 4. Run on Android
 
-Модель автоматически использует NNAPI (GPU/NPU) если доступно, иначе fallback на CPU. Execution providers настраиваются в `src/services/onnxService.ts`.
+1. Launch your Android emulator, e.g.:
 
-## Запуск приложения
+```bash
+emulator -avd Pixel_8_Pro
+```
 
-### Android
+Tested successfully on **Pixel 8 Pro**.
+
+2. In a separate terminal, run the Android app:
 
 ```bash
 npm run android
 ```
 
-### iOS
-
-Сначала установите CocoaPods зависимости:
-
-```bash
-bundle install
-bundle exec pod install
-```
-
-Затем запустите:
-
-```bash
-npm run ios
-```
-
-## Использование
-
-1. Нажмите "Выбрать изображение" для выбора изображения из галереи
-2. Настройте количество результатов (по умолчанию 10)
-3. Нажмите "Найти похожие" для выполнения поиска
-4. Результаты отображаются с расстоянием и меткой (caption)
-
-## Производительность
-
-- Модель загружается при старте приложения
-- **Embeddings и captions загружаются в нативную память (не в JavaScript heap)** - решает проблему OOM для больших файлов (>200MB)
-- Поиск выполняется в нативной памяти через нативный модуль `FaissSearch`
-- Данные не попадают в JavaScript heap, что позволяет работать с большими базами данных
-- Поиск выполняется с вычислением косинусного расстояния для всех векторов (линейный поиск O(n))
-
-## Известные ограничения
-
-1. **Предобработка изображений**: ✅ Реализовано через нативный модуль `ImageDecoder`
-2. **Поиск по векторам**: ✅ Реализовано через нативный модуль `FaissSearch` (данные в нативной памяти)
-3. **Загрузка assets**: Для iOS может потребоваться дополнительная настройка
-4. **Поиск**: Текущая реализация использует линейный поиск O(n). Для очень больших баз (>1M векторов) можно добавить индексацию через Faiss IndexFlat или IndexIVF
-
-## Дальнейшие улучшения
-
-- [x] Создать нативный модуль для предобработки изображений
-- [x] Интегрировать нативный модуль для работы с большими файлами (данные в нативной памяти)
-- [ ] Добавить индексацию через Faiss IndexFlat/IndexIVF для ускорения поиска на очень больших базах
-- [ ] Оптимизировать парсинг JSON для очень больших файлов captions
-- [ ] Добавить поддержку камеры для захвата изображений
-- [ ] Добавить кэширование результатов поиска
+The app will build and deploy to the emulator.
 
 ---
 
-This is a [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+### 5. Run on iOS
 
-# Getting Started
+1. Ensure you have **Xcode** and an iOS simulator installed.
+2. Install CocoaPods dependencies:
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
-
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+```bash
+cd ios && pod install && cd ..
 ```
 
-## Step 2: Build and run your app
+3. Start the iOS app:
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android --deviceId Pixel_8_Pro or before this do emulator -avd Pixel_8_Pro and after npm run android
-
-# OR using Yarn
-yarn android
+```bash
+npx react-native run-ios
 ```
 
-### iOS
+Select the desired simulator from Xcode if needed.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+---
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## How It Works
 
-```sh
-bundle install
-```
+The mobile app interacts with the three ML models:
 
-Then, and every time you update your native dependencies, run:
+1. **Disease Detection** – Users upload images of leaves, stems, or flowers. The app converts the image into a feature vector and compares it against `embeddings.bin` to detect plant diseases.
+2. **Plant Classification** – Users upload an image of the whole plant. The model predicts the species based on the ONNX classifier and `class_mapping.txt` → `species_id_to_name.txt`.
+3. **Age & Leaf Count Estimation** – Users upload the full plant image. The MVVT model estimates the plant's age (in days) and leaf count.
 
-```sh
-bundle exec pod install
-```
+All models are optimized for mobile use via ONNX.
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## Notes
 
-# OR using Yarn
-yarn ios
-```
+* The app uses **ONNX Runtime** for mobile inference.
+* The `assets` folder must contain **all required models and mapping files**.
+* The app demonstrates **uploading photos**, preprocessing them, running inference, and displaying results in a mobile-friendly UI.
+* Works both on **Android** and **iOS**, with hardware acceleration when available.
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+This setup provides a **complete mobile demonstration** of plant ML models and can be extended for custom datasets, additional plant species, or integration into production mobile apps.
 
-## Step 3: Modify your app
+<!-- CONTACT -->
+## Contact
 
-Now that you have successfully run the app, let's make changes!
+Owner: [Wladislav Radchenko](https://github.com/wladradchenko/)
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+Email: [i@wladradchenko.ru](i@wladradchenko.ru)
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+Project on GitHub: [https://github.com/wladradchenko/berkano.wladradchenko.ru](https://github.com/wladradchenko/berkano.wladradchenko.ru)
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+<p align="right">(<a href="#top">to top</a>)</p>
 
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.

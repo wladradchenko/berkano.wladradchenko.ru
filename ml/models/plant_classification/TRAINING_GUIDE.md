@@ -1,115 +1,115 @@
-# Руководство по дообучению модели
+# Plant Classification Model Training Guide
 
-## Описание
+This repository provides scripts for training or fine-tuning the `vit_base_patch14_reg4_dinov2_lvd142m_pc24_onlyclassifier_then_all` model on custom plant image datasets. The model can classify images into species categories, supporting both training from scratch and transfer learning from pretrained weights.
 
-Это руководство описывает, как дообучить предобученную модель `vit_base_patch14_reg4_dinov2_lvd142m_pc24_onlyclassifier_then_all` на новых данных с огородными растениями.
+The model is based on **Vision Transformer (ViT)** architecture with a classifier head for plant species recognition. It can be trained on datasets organized as folders or CSV files.
 
-## Формат данных
+## Features
 
-Модель поддерживает два формата организации данных:
+* Fine-tune a pretrained ViT model or train from scratch.
+* Supports multiple data formats: folder structure or CSV file.
+* Automatically handles class mappings.
+* Supports learning rate schedulers, weight decay, label smoothing, and EMA (Exponential Moving Average).
+* Outputs checkpoints and training history for analysis.
 
-### Вариант 1: Структура папок (рекомендуется)
+## Dataset Structure
 
-Организуйте данные следующим образом:
+The dataset can be organized in one of two ways:
 
-```
-data_dir/
-├── train/
-│   ├── species_id_1/
-│   │   ├── image1.jpg
-│   │   ├── image2.jpg
-│   │   └── ...
-│   ├── species_id_2/
-│   │   ├── image1.jpg
-│   │   └── ...
-│   └── ...
-└── val/
-    ├── species_id_1/
-    │   ├── image1.jpg
-    │   └── ...
-    ├── species_id_2/
-    │   └── ...
-    └── ...
-```
-
-**Важно:**
-
-- Названия папок должны соответствовать `species_id` (например, "1355868", "1355869")
-- Имена папок в train и val должны совпадать
-- Поддерживаемые форматы изображений: `.jpg`, `.jpeg`, `.png`
-
-### Вариант 2: CSV файлы
-
-Создайте два CSV файла: `train.csv` и `val.csv` в директории с данными.
-
-**Формат CSV:**
-
-```csv
-image_path,label
-/path/to/image1.jpg,1355868
-/path/to/image2.jpg,1355869
-/path/to/image3.jpg,1355868
-...
-```
-
-**Колонки:**
-
-- `image_path`: абсолютный или относительный путь к изображению
-- `label`: species_id (строка, например "1355868")
-
-**Пример структуры:**
+**Folder structure:**
 
 ```
-data_dir/
-├── train.csv
-└── val.csv
+/data_dir/
+    ├── train/
+    │   ├── species_1/
+    │   │   ├── img_001.jpg
+    │   │   ├── img_002.jpg
+    │   │   └── ...
+    │   ├── species_2/
+    │   │   ├── ...
+    ├── val/
+    │   ├── species_1/
+    │   └── species_2/
 ```
 
-## Предобработка изображений
+**CSV file format:**
 
-**ВАЖНО:** Модель автоматически применяет необходимые трансформации. Вам НЕ нужно делать resize или другую предобработку вручную.
+```
+/data_dir/
+    ├── train.csv
+    ├── val.csv
+```
 
-### Что делает модель автоматически:
+CSV files must contain two columns: `image_path` (absolute or relative path to the image) and `label` (class name).
 
-1. **Resize и Crop:**
+The script automatically creates `class_mapping.txt` if not provided, mapping each class name to an integer index.
 
-   - Изображения автоматически приводятся к размеру, требуемому моделью
-   - Используется random crop для обучения и center crop для валидации
+## Requirements
 
-2. **Нормализация:**
+Install required Python packages:
 
-   - Применяется нормализация с параметрами модели
+```bash
+pip install torch torchvision timm pandas tqdm pillow
+```
 
-3. **Аугментации (только для обучения):**
-   - Random horizontal flip (вероятность 0.5)
-   - Color jitter (яркость, контраст, насыщенность)
-   - Random scale и ratio
+Optional packages for optimized training (if using EMA, schedulers, or advanced optimizers) are included in `timm`.
 
-### Требования к исходным изображениям:
+## Usage
 
-- **Формат:** JPG, JPEG или PNG
-- **Цвет:** RGB (цветные изображения)
-- **Размер:** Любой (будет автоматически изменен)
-- **Качество:** Рекомендуется минимум 224x224 пикселей для лучших результатов
+### Command Line
 
-### Что НЕ нужно делать:
+Run the training script with the following parameters:
 
-- ❌ Не нужно делать resize вручную
-- ❌ Не нужно применять нормализацию
-- ❌ Не нужно конвертировать в grayscale
-- ❌ Не нужно делать crop вручную
+```bash
+python train.py \
+    --data_dir /path/to/your/data \
+    --pretrained_path /path/to/model_best.pth.tar  # optional, None to train from scratch
+    --class_mapping /path/to/class_mapping.txt     # optional
+    --output_dir ./outputs \
+    --epochs 50 \
+    --batch_size 32 \
+    --lr 1e-5
+```
 
-## Настройка классов
+### Key Arguments
 
-### Вариант 1: Использование существующего class_mapping.txt
+* `--data_dir`: Path to your dataset directory (must include `train/` and `val/` folders or CSV files).
+* `--pretrained_path`: Path to a pretrained checkpoint (optional).
+* `--class_mapping`: Optional class mapping file. Automatically generated if not provided.
+* `--output_dir`: Directory to save checkpoints and training results.
+* `--epochs`: Number of training epochs.
+* `--batch_size`: Batch size for training.
+* `--lr`: Initial learning rate.
+* `--weight_decay`: Weight decay for optimizer.
+* `--opt`: Optimizer type (default `adam`).
+* `--sched`: Learning rate scheduler (`cosine`, `step`, etc.).
+* `--warmup_epochs`: Number of warmup epochs.
+* `--label_smoothing`: Label smoothing value (default 0.1).
+* `--model_ema`: Use Exponential Moving Average (EMA) for smoother weights.
+* `--model_ema_decay`: EMA decay factor (default 0.9998).
+* `--workers`: Number of data loading workers.
+* `--device`: Device for training (`cuda` or `cpu`).
 
-Если вы добавляете новые классы к существующим:
+### Example
 
-1. Откройте `class_mapping.txt`
-2. Добавьте новые `species_id` в конец файла (по одному на строку)
-3. Убедитесь, что в `species_id_to_name.txt` есть соответствующие записи
+```bash
+python train.py \
+    --data_dir ./garden_dataset \
+    --pretrained_path ./outputs/model_best.pth.tar \
+    --output_dir ./outputs_finetuned \
+    --epochs 30 \
+    --batch_size 16 \
+    --lr 3e-5 \
+    --opt adam \
+    --sched cosine \
+    --model_ema \
+    --workers 8
+```
+### Class Mapping
 
-**Пример class_mapping.txt:**
+The training script uses a class mapping file to convert class names to integer indices. If the file is not provided, it will be generated automatically from your dataset.
+
+**Example `class_mapping.txt`:**
 
 ```
 1355868
@@ -120,179 +120,41 @@ NEW_SPECIES_ID_1
 NEW_SPECIES_ID_2
 ```
 
-### Вариант 2: Автоматическое создание class_mapping.txt
+After adding new classes, update the corresponding `species_id_to_name.txt` file to map species IDs to their names:
 
-Если вы не указываете `--class_mapping`, скрипт автоматически создаст файл на основе данных в папках train/val.
-
-**Важно:** При автоматическом создании порядок классов определяется алфавитной сортировкой названий папок.
-
-## Обновление species_id_to_name.txt
-
-После добавления новых классов, обновите файл `species_id_to_name.txt`:
-
-**Формат:**
+**Example `species_id_to_name.txt`:**
 
 ```csv
 "species_id";"species"
 "1355868";"Taxus baccata L."
 "1355869";"Dryopteris filix-mas (L.) Schott"
-"NEW_SPECIES_ID_1";"Название нового вида"
+"NEW_SPECIES_ID_1";"New species name"
+"NEW_SPECIES_ID_2";"Another new species"
 ```
 
-**Важно:**
+This ensures that your training outputs can correctly translate predicted class indices back to species names.
 
-- Используйте точку с запятой (`;`) как разделитель
-- Используйте кавычки для значений
-- species_id должен быть строкой
+### Outputs
 
-## Запуск обучения
+* `last.pth.tar`: Last checkpoint.
+* `model_best.pth.tar`: Best model based on validation top-1 accuracy.
+* `class_mapping.txt`: Mapping of class names to indices.
+* `training_history.csv`: Epoch-wise training and validation metrics (loss, top-1 and top-5 accuracy, learning rate).
 
-### Базовый пример:
+### Notes
 
-```bash
-python train.py \
-    --data_dir /path/to/your/data \
-    --pretrained_path /path/to/vit_base_patch14_reg4_dinov2_lvd142m_pc24_onlyclassifier_then_all/model_best.pth.tar \
-    --class_mapping /path/to/class_mapping.txt \
-    --output_dir ./outputs \
-    --epochs 50 \
-    --batch_size 32 \
-    --lr 1e-5
-```
+* The script automatically handles varying numbers of classes, replacing the classifier head if needed.
+* If pretrained weights are provided, the classifier head is partially copied to support new classes.
+* Images failing to load are replaced with black images to prevent training interruptions.
+* Validation metrics are computed each epoch to monitor overfitting.
 
-### Пример с автоматическим определением классов:
+<!-- CONTACT -->
+## Contact
 
-```bash
-python train.py \
-    --data_dir /path/to/your/data \
-    --pretrained_path /path/to/model_best.pth.tar \
-    --output_dir ./outputs \
-    --epochs 50 \
-    --batch_size 32 \
-    --lr 1e-5
-```
+Owner: [Wladislav Radchenko](https://github.com/wladradchenko/)
 
-### Пример с дополнительными параметрами:
+Email: [i@wladradchenko.ru](i@wladradchenko.ru)
 
-```bash
-python train.py \
-    --data_dir /path/to/your/data \
-    --pretrained_path /path/to/model_best.pth.tar \
-    --output_dir ./outputs \
-    --epochs 100 \
-    --batch_size 64 \
-    --lr 8e-5 \
-    --weight_decay 0.0 \
-    --opt adam \
-    --sched cosine \
-    --warmup_epochs 5 \
-    --model_ema \
-    --workers 8
-```
+Project on GitHub: [https://github.com/wladradchenko/berkano.wladradchenko.ru](https://github.com/wladradchenko/berkano.wladradchenko.ru)
 
-## Параметры обучения
-
-### Основные параметры:
-
-- `--data_dir`: Путь к директории с данными (обязательно)
-- `--pretrained_path`: Путь к предобученной модели (обязательно)
-- `--class_mapping`: Путь к class_mapping.txt (опционально)
-- `--output_dir`: Директория для сохранения результатов (по умолчанию: ./outputs)
-
-### Гиперпараметры:
-
-- `--epochs`: Количество эпох (по умолчанию: 50)
-- `--batch_size`: Размер батча (по умолчанию: 32)
-- `--lr`: Начальный learning rate (по умолчанию: 1e-5)
-- `--weight_decay`: Weight decay (по умолчанию: 0.0)
-- `--opt`: Оптимизатор: adam, sgd (по умолчанию: adam)
-- `--sched`: Планировщик LR: cosine, step (по умолчанию: cosine)
-- `--label_smoothing`: Label smoothing (по умолчанию: 0.1)
-
-### Рекомендуемые значения:
-
-Для дообучения на новых данных рекомендуется:
-
-- **Learning rate:** 1e-5 до 1e-4 (меньше чем для обучения с нуля)
-- **Batch size:** 32-64 (зависит от размера GPU)
-- **Epochs:** 30-100 (зависит от размера датасета)
-- **Weight decay:** 0.0 (как в оригинальной модели)
-
-## Результаты обучения
-
-После обучения в `output_dir` будут созданы:
-
-1. **model_best.pth.tar** - лучшая модель (по точности на валидации)
-2. **last.pth.tar** - последний чекпоинт
-3. **class_mapping.txt** - маппинг классов (если создан автоматически)
-4. **training_history.csv** - история обучения (loss, accuracy по эпохам)
-
-## Использование обученной модели
-
-После обучения используйте модель так же, как оригинальную:
-
-```python
-import timm
-import torch
-from PIL import Image
-
-# Загрузите модель
-model = timm.create_model(
-    'vit_base_patch14_reg4_dinov2.lvd142m',
-    pretrained=False,
-    num_classes=YOUR_NUM_CLASSES,
-    checkpoint_path='./outputs/model_best.pth.tar'
-)
-model.eval()
-
-# Загрузите изображение и примените трансформации
-data_config = timm.data.resolve_model_data_config(model)
-transforms = timm.data.create_transform(**data_config, is_training=False)
-
-image = Image.open('your_image.jpg')
-image = transforms(image).unsqueeze(0)
-
-# Предсказание
-with torch.no_grad():
-    output = model(image)
-    probabilities = torch.softmax(output, dim=1)
-    top5_prob, top5_idx = torch.topk(probabilities, 5)
-```
-
-## Часто задаваемые вопросы
-
-### Q: Нужно ли делать resize изображений перед обучением?
-
-**A:** Нет, модель автоматически применяет все необходимые трансформации.
-
-### Q: Можно ли использовать изображения разных размеров?
-
-**A:** Да, модель автоматически изменяет размер всех изображений.
-
-### Q: Как добавить новые классы к существующим?
-
-**A:** Добавьте новые species_id в конец class_mapping.txt и убедитесь, что они есть в species_id_to_name.txt.
-
-### Q: Что делать, если у меня мало данных?
-
-**A:** Используйте меньший learning rate (1e-5), больше эпох, и включите аугментации (они включены по умолчанию).
-
-### Q: Можно ли использовать модель без дообучения?
-
-**A:** Да, используйте basic_usage_pretrained_model.py с оригинальной моделью.
-
-## Требования
-
-- Python 3.7+
-- PyTorch 2.2.1+
-- timm 0.9.16+
-- pandas
-- Pillow
-- tqdm
-
-## Примечания
-
-- Модель использует архитектуру ViT-Base с patch size 14
-- Предобучена на DINOv2 (self-supervised learning)
-- Исходная модель обучена на 7806 классах PlantNet
-- При добавлении новых классов классификатор будет переинициализирован
+<p align="right">(<a href="#top">to top</a>)</p>

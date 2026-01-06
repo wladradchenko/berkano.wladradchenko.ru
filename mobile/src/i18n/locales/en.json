@@ -1,0 +1,52 @@
+{
+  "app": {
+    "title": "Plant Analysis",
+    "analyze": "Analyze",
+    "status": {
+      "models": "Models",
+      "ready": "Ready",
+      "loading": "Loading..."
+    }
+  },
+  "plantClassification": {
+    "title": "1. Plant Classification",
+    "description": "Upload 1 plant photo to identify the species",
+    "selectButton": "Select Plant Photo",
+    "changeButton": "Change Plant Photo",
+    "remove": "Remove",
+    "resultsTitle": "Classification Results:",
+    "probability": "Probability",
+    "noImage": "No image selected"
+  },
+  "diseaseSearch": {
+    "title": "2. Disease Search",
+    "description": "Upload 0 to 10 photos of problem areas (leaves, stems)",
+    "selectButton": "Select Problem Area Photos",
+    "changeButton": "Change Photos",
+    "resultsTitle": "Disease Search Results:",
+    "photo": "Photo",
+    "distance": "Distance",
+    "noImages": "No images selected",
+    "resultsCount": "results"
+  },
+  "initialization": {
+    "modelManager": "Initializing model management system...",
+    "loadingData": "Loading search data...",
+    "ready": "Ready!",
+    "hint": "This may take some time..."
+  },
+  "errors": {
+    "initFailed": "Initialization Error",
+    "analysisFailed": "Analysis Error",
+    "noImages": "Error",
+    "noImagesMessage": "Upload at least one image",
+    "notReady": "Error",
+    "notReadyMessage": "System is not ready yet",
+    "tryAgain": "Try restarting the application."
+  },
+  "common": {
+    "remove": "Remove",
+    "delete": "Delete"
+  }
+}
+

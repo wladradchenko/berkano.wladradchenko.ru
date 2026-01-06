@@ -56,8 +56,16 @@ export async function prepareModelAssets() {
   const modelPath = await copyAssetIfNeeded('scold_image_only_fp16.onnx', 'models');
   const embeddingsPath = await copyAssetIfNeeded('embeddings.bin', 'files');
   const captionsPath = await copyAssetIfNeeded('captions.json', 'files');
+  const classMappingPath = await copyAssetIfNeeded('class_mapping.txt', 'files');
+  const speciesMappingPath = await copyAssetIfNeeded('species_id_to_name.txt', 'files');
 
-  return { modelPath, embeddingsPath, captionsPath };
+  return { 
+    modelPath, 
+    embeddingsPath, 
+    captionsPath,
+    classMappingPath,
+    speciesMappingPath,
+  };
 }
 
 export interface ModelSession {

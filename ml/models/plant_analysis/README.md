@@ -1,95 +1,51 @@
-# GroMo-Plant-Growth-Modeling-with-Multiview-Images
-Plant Growth Modelling using age estimation (in days) and leaf counting
+# Inference (PTH / ONNX)
 
-# Multi View Vision Transformer (MVVT) for Plant Age and Leaf Count Estimation
+This script provides inference for the LeafNet model, predicting plant age and leaf count from a single image. The script supports both PyTorch `.pth` models and ONNX `.onnx` models optimized for mobile devices.
 
-This repository implements a Multi View Vision Transformer (MVVT) model for estimating the age (in days) and the number of leaves of a plant using multi-view image data. The model is trained using a dataset containing images of plants at different growth stages.
-A single model file has been created for both tasks: plant age estimation (model[1]) and leaf count prediction (model[0]), as both are trained on the same dataset.
-## Features
-- Uses a **Vision Transformer (ViT)** for feature extraction and prediction.
-- Supports training with configurable hyperparameters.
-- Handles multiple views of a plant by concatenating latent representations.
-- Computes RMSE loss for both **plant age estimation** and **leaf count prediction**.
+The model uses a MobileNet backbone with two regression heads for leaf count and age estimation. Input images should be RGB and resized to 224x224 pixels. Outputs are returned as a dictionary containing `leaf_count` and `age` values.
 
-## Important Parameters
-- **Number of Plants (`n_plants`)**: Defines how many different plants are included in the dataset.
-- **Maximum Days of Crop (`max_days`)**: The maximum number of days considered for plant growth.
-- **Number of Multi-View Images (`n_images`)**: The number of images selected from the total 24 available multi-view images per plant.
+## Setup
 
-## Dataset Structure
-The dataset consists of images of multiple plants (`p1`, `p2`, ..., `pn`) captured over different days (`d1`, `d2`, ..., `dm`) and categorized into five levels (`L1`, `L2`, `L3`, `L4`, `L5`). Each plant has **24 images** per growth cycle, representing different angles with a **15-degree gap** between consecutive images.
+Clone the repository containing the model:
 
-### Naming Convention
-Each image follows the format:
-```
-radish_pX_dY_LZ_A.jpg
-```
-where:
-- `X` represents the plant ID (`p1, p2, ...`)
-- `Y` represents the day (`d1, d2, ...`)
-- `Z` represents the level (`L1, L2, L3, L4, L5`)
-- `A` represents the angle (ranging from `0` to `345` degrees in 15-degree increments)
-
-### Directory Structure
-```
-/dataset/
-    ├── train/
-    │   ├── p1/
-    │   │   ├── d1/
-    │   │   │   ├── L1/
-    │   │   │   │   ├── radish_p1_d1_L1_0.png
-    │   │   │   │   ├── radish_p1_d1_L1_15.png
-    │   │   │   │   ├── ...
-    │   │   │   │   ├── radish_p1_d1_L1_345.png
-    │   │   │   ├── L2/
-    │   │   │   ├── L3/
-    │   │   │   ├── L4/
-    │   │   │   ├── L5/
-    │   │   ├── d2/
-    │   │   ├── ...
-    │   ├── p2/
-    │   ├── ...
-
-```
-Each plant has images captured at different time points (`d1`, `d2`, ...), categorized into five levels (`L1` to `L5`), with a total of 24 images per level taken from different angles.
-
-## Requirements
-Ensure you have the following dependencies installed:
 ```bash
-pip install torch torchvision numpy tqdm
+git clone https://huggingface.co/wladradchenko/berkano.wladradchenko.ru
+```
+
+Create a `checkpoints` directory in the current working directory and place the ONNX model there:
+
+```bash
+mkdir checkpoints
+cp berkan.wladradchenko.ru/model/plant_analysis.onnx checkpoints/
+```
+
+Install required dependencies:
+
+```bash
+pip install torch torchvision onnxruntime pillow numpy
 ```
 
 ## Usage
 
-### 1. Dataset Preparation
-Modify the dataset path in `CropDataset` to point to your dataset location.
+Run the inference script with the path to the model and an image file or URL:
 
-### 2. Training
-Run the following command to train the ViT model:
 ```bash
-python main.py
+python inference.py --model_path checkpoints/plant_analysis.onnx --image example/radish_p2_d13_L2_300.png
 ```
-Hyperparameters such as the number of epochs, batch size, and learning rate can be modified directly in `main.py`.
 
-### 3. Model Architecture
-In the code, the Multi-View Vision Transformer (MVVT) is used for two task separetly:
+The output will be a JSON-like dictionary:
 
-- **MVVT for Plant Age Estimation (model[1])
-- **MVVT for Leaf Count Prediction (model[0])
+```json
+{
+    "leaf_count": 6.18,
+    "age": 13.16
+}
+```
 
-Each model takes n_images views as input, processes them through attention mechanisms, and then combines the extracted features using a pooling layer. The final representation is used to predict both leaf count and plant age. Below is the model architecture:
+If using a `.pth` model instead of ONNX, the same script can be used by replacing the model path:
 
+```bash
+python inference.py --model_path checkpoints/plant_analysis.pth --image example/radish_p2_d13_L2_300.png
+```
 
-### 4. Output Metrics
-- **Leaf Count RMSE**: Measures the root mean squared error in predicting the number of leaves.
--  **Leaf Count MAE**: Measures the mean absolute error in predicting the number of leaves.
-- **Age RMSE**: Measures the root mean squared error  in predicting the plant’s age.
-- **Age MAE**: Measures the mean absolute error in predicting the plant’s age.
-
-## Results
-During training, the loss function minimizes the RMSE loss for both leaf count and plant age. The model prints training losses per epoch.
-
-## Dataset
-Dataset will be made available on request. Please email your request to mrig@iitrpr.ac.in
-
-
+The script automatically detects whether to use PyTorch or ONNX runtime and will run on GPU if available.
