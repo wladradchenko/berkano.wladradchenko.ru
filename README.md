@@ -11,7 +11,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/wladradchenko/berkano.wladradchenko.ru">
-    <img src="https://raw.githubusercontent.com/wladradchenko/berkano.wladradchenko.ru/main/assets/tree.svg" width="200px" height="200px">
+    <img src="https://github.com/wladradchenko/berkano.wladradchenko.ru/blob/main/assets/leaves.svg" width="200px" height="200px">
   </a>
 
   <h3 align="center">Berkano</h3>
