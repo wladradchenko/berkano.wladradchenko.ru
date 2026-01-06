@@ -11,7 +11,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/wladradchenko/berkano.wladradchenko.ru">
-    <img src="https://wunjo.online/static/basic/icon/round/logo-512.png" alt="Logo" width="165" height="165">
+    <img src="https://raw.githubusercontent.com/wladradchenko/berkano.wladradchenko.ru/main/assets/tree.svg" width="200px" height="200px">
   </a>
 
   <h3 align="center">Berkano</h3>
