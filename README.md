@@ -1,7 +1,7 @@
 [![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/wladradchenko/berkano.wladradchenko.ru/blob/main/LICENSE)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-310/)
 [![GitHub package version](https://img.shields.io/github/v/release/wladradchenko/berkano.wladradchenko.ru?display_name=tag&sort=semver)](https://github.com/wladradchenko/berkano.wladradchenko.ru)
-[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](https://github.com/wladradchenko/berkano.wladradchenko.ru/blob/main/LICENSE)
+[![License: CC  4.0](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/wladradchenko/berkano.wladradchenko.ru/blob/main/LICENSE)
 <br>
 [![Hugging Face Models](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-yellow)](https://huggingface.co/wladradchenko/berkano.wladradchenko.ru)
 [![Patreon Support](https://img.shields.io/badge/Patreon-Support-white?style=flat&logo=patreon&logoColor=white)](https://patreon.com/wladradchenko)
@@ -91,15 +91,6 @@ The `mobile` folder contains a **React Native (vanilla, no Expo) app** that demo
 * Requires models and supporting files to be placed in `mobile/assets` (from the same HuggingFace repository)
 
 For detailed instructions on running the mobile app, see the `mobile/README.md` and [interface screen](https://github.com/wladradchenko/berkano.wladradchenko.ru/blob/main/assets/example.png).
-
----
-
-## License
-
-This project is licensed under the **Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)**.
-You are free to **share** the project, **but not use it commercially or modify it**.
-
-Full license details: [https://creativecommons.org/licenses/by-nc-nd/4.0/](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
 ---
 
