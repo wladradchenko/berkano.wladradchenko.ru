@@ -6,7 +6,7 @@ from model import LVL
 def export(model_path: str, output_name: str):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Create a dummy input with the same dimensions as the real data.
-    dummy_input = torch.randn(1, 3, 512, 512, device=device)
+    dummy_input = torch.randn(1, 3, 224, 224, device=device)
 
     # Load model
     model = LVL()
